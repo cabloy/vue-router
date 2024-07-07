@@ -223,7 +223,7 @@ export function useLink<Name extends keyof RouteMap = keyof RouteMap>(
   }
 
   // devtools only
-  if ((__DEV__ || __FEATURE_PROD_DEVTOOLS__) && isBrowser && false) {
+  if ((__DEV__ || __FEATURE_PROD_DEVTOOLS__) && isBrowser) {
     const instance = getCurrentInstance()
     if (instance) {
       const linkContextDevtools: UseLinkDevtoolsContext = {
