@@ -109,7 +109,7 @@ function createConfig(buildName, output, plugins = []) {
   // during a single build.
   hasTSChecked = true
 
-  const external = ['vue']
+  const external = ['vue', '@cabloy/module-info']
   if (
     !isGlobalBuild &&
     // vue-router.prod.cjs should not require `@vue/devtools-api` (like Vue)
