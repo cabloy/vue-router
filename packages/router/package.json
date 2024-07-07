@@ -1,6 +1,6 @@
 {
   "name": "@cabloy/vue-router",
-  "version": "4.4.1",
+  "version": "4.4.2",
   "main": "index.js",
   "unpkg": "dist/vue-router.global.js",
   "jsdelivr": "dist/vue-router.global.js",
@@ -117,6 +117,7 @@
     "@vue/devtools-api": "^6.6.3"
   },
   "devDependencies": {
+    "@cabloy/module-info": "^1.0.19",
     "@microsoft/api-extractor": "^7.40.1",
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^25.0.7",
