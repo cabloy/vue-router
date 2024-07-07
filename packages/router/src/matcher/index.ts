@@ -243,7 +243,7 @@ export function createRouterMatcher(
 
     if ('name' in location && location.name) {
       matcher = matcherMap.get(location.name)
-
+      if (!matcher) return resolve({ path: '/404' }, currentLocation)
       if (!matcher)
         throw createRouterError<MatcherError>(ErrorTypes.MATCHER_NOT_FOUND, {
           location,

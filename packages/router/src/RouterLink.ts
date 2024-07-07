@@ -313,10 +313,11 @@ export const RouterLinkImpl = /*#__PURE__*/ defineComponent({
         : h(
             'a',
             {
+              'data-hydrate-ignore-href': '',
               'aria-current': link.isExactActive
                 ? props.ariaCurrentValue
                 : null,
-              href: link.href,
+              href: link.href === '/404' ? (<any>props.to)?.name : link.href,
               // this would override user added attrs but Vue will still add
               // the listener, so we end up triggering both
               onClick: link.navigate,

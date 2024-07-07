@@ -69,6 +69,7 @@ import { addDevtools } from './devtools'
 import { _LiteralUnion } from './types/utils'
 import { RouteLocationAsRelativeTyped } from './typed-routes/route-location'
 import { RouteMap } from './typed-routes/route-map'
+import * as ModuleInfo from '@cabloy/module-info'
 
 /**
  * Internal type to define an ErrorHandler
@@ -676,10 +677,23 @@ export function createRouter(options: RouterOptions): Router {
     }
   }
 
-  function pushWithRedirect(
+  async function pushWithRedirect(
     to: RouteLocationRaw | RouteLocation,
     redirectedFrom?: RouteLocation
   ): Promise<NavigationFailure | void | undefined> {
+    // patch
+    const _path = to && typeof to === 'object' ? (<any>to).name ?? to.path : to
+    const moduleName = ModuleInfo.parseName(_path)
+    if (moduleName) {
+      const app = installedApps.values().next().value
+      if (app.zova.meta.module.exists(moduleName)) {
+        const module = app.zova.meta.module.get(moduleName, false)
+        if (!module) {
+          await app.zova.meta.module.use(moduleName)
+        }
+      }
+    }
+
     const targetLocation: RouteLocation = (pendingLocation = resolve(to))
     const from = currentRoute.value
     const data: HistoryState | undefined = (to as RouteLocationOptions).state
@@ -1253,6 +1267,9 @@ export function createRouter(options: RouterOptions): Router {
     isReady,
 
     install(app: App) {
+      // patch
+      installedApps.add(app)
+
       const router = this
       app.component('RouterLink', RouterLink)
       app.component('RouterView', RouterView)
@@ -1293,7 +1310,7 @@ export function createRouter(options: RouterOptions): Router {
       app.provide(routerViewLocationKey, currentRoute)
 
       const unmountApp = app.unmount
-      installedApps.add(app)
+
       app.unmount = function () {
         installedApps.delete(app)
         // the router is not attached to an app anymore
