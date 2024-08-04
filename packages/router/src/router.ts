@@ -686,9 +686,11 @@ export function createRouter(options: RouterOptions): Router {
     const moduleName = ModuleInfo.parseName(_path)
     if (moduleName) {
       const app = installedApps.values().next().value
-      const module = app.zova.meta.module.get(moduleName, false)
-      if (!module) {
-        await app.zova.meta.module.use(moduleName)
+      if (app.zova.meta.module.exists(moduleName)) {
+        const module = app.zova.meta.module.get(moduleName, false)
+        if (!module) {
+          await app.zova.meta.module.use(moduleName)
+        }
       }
     }
 
