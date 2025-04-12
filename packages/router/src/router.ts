@@ -30,7 +30,11 @@ import {
   scrollToPosition,
   _ScrollPositionNormalized,
 } from './scrollBehavior'
-import { createRouterMatcher, PathParserOptions } from './matcher'
+import {
+  createRouterMatcher,
+  PathParserOptions,
+  RouterMatcher,
+} from './matcher'
 import {
   createRouterError,
   ErrorTypes,
@@ -111,6 +115,7 @@ export interface RouterScrollBehavior {
  * Options to initialize a {@link Router} instance.
  */
 export interface RouterOptions extends PathParserOptions {
+  matcher?: RouterMatcher
   /**
    * History implementation used by the router. Most web applications should use
    * `createWebHistory` but it requires the server to be properly configured.
@@ -188,6 +193,7 @@ export interface RouterOptions extends PathParserOptions {
  * Router instance.
  */
 export interface Router {
+  matcher: RouterMatcher
   /**
    * @internal
    */
@@ -384,7 +390,8 @@ export interface Router {
  * @param options - {@link RouterOptions}
  */
 export function createRouter(options: RouterOptions): Router {
-  const matcher = createRouterMatcher(options.routes, options)
+  const matcher =
+    options.matcher ?? createRouterMatcher(options.routes, options)
   const parseQuery = options.parseQuery || originalParseQuery
   const stringifyQuery = options.stringifyQuery || originalStringifyQuery
   const routerHistory = options.history
@@ -685,7 +692,7 @@ export function createRouter(options: RouterOptions): Router {
     const _path = to && typeof to === 'object' ? (<any>to).name ?? to.path : to
     const moduleName = ModuleInfo.parseName(_path)
     if (moduleName) {
-      const app = installedApps.values().next().value
+      const app = installedApps.values().next().value as any
       if (app.zova.meta.module.exists(moduleName)) {
         const module = app.zova.meta.module.get(moduleName, false)
         if (!module) {
@@ -1242,6 +1249,8 @@ export function createRouter(options: RouterOptions): Router {
   const installedApps = new Set<App>()
 
   const router: Router = {
+    matcher,
+
     currentRoute,
     listening: true,
 
