@@ -690,16 +690,8 @@ export function createRouter(options: RouterOptions): Router {
   ): Promise<NavigationFailure | void | undefined> {
     // patch
     const _path = to && typeof to === 'object' ? (<any>to).name ?? to.path : to
-    const moduleName = ModuleInfo.parseName(_path)
-    if (moduleName) {
-      const app = installedApps.values().next().value as any
-      if (app.zova.meta.module.exists(moduleName)) {
-        const module = app.zova.meta.module.get(moduleName, false)
-        if (!module) {
-          await app.zova.meta.module.use(moduleName)
-        }
-      }
-    }
+    const app = installedApps.values().next().value as any
+    await app.meta.$router.ensureRoute(_path)
 
     const targetLocation: RouteLocation = (pendingLocation = resolve(to))
     const from = currentRoute.value
