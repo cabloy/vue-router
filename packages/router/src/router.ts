@@ -73,7 +73,6 @@ import { addDevtools } from './devtools'
 import { _LiteralUnion } from './types/utils'
 import { RouteLocationAsRelativeTyped } from './typed-routes/route-location'
 import { RouteMap } from './typed-routes/route-map'
-import * as ModuleInfo from '@cabloy/module-info'
 
 /**
  * Internal type to define an ErrorHandler
