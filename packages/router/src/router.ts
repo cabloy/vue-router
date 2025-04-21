@@ -690,7 +690,7 @@ export function createRouter(options: RouterOptions): Router {
     // patch
     const _path = to && typeof to === 'object' ? (<any>to).name ?? to.path : to
     const app = installedApps.values().next().value as any
-    await app.meta.$router.ensureRoute(_path)
+    await app.zova.meta.$router.ensureRoute(_path)
 
     const targetLocation: RouteLocation = (pendingLocation = resolve(to))
     const from = currentRoute.value
