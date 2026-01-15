@@ -346,7 +346,7 @@ export interface Router {
    *
    * @example
    * ```js
-   * router.afterEach((to, from, failure) => {
+   * router.afterEach((to, from, failure, info) => {
    *   if (isNavigationFailure(failure)) {
    *     console.log('failed navigation', failure)
    *   }
