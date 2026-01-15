@@ -1,6 +1,6 @@
 {
   "name": "@cabloy/vue-router",
-  "version": "4.4.13",
+  "version": "4.4.14",
   "main": "index.js",
   "unpkg": "dist/vue-router.global.js",
   "jsdelivr": "dist/vue-router.global.js",
@@ -80,7 +80,7 @@
   "files": [
     "index.js",
     "dist/*.{js,cjs,mjs}",
-    "dist/vue-router.d.mts",
+    "dist/*.d.{ts,mts}",
     "vue-router-auto.d.ts",
     "vue-router-auto-routes.d.ts",
     "vetur/tags.json",
