@@ -928,6 +928,7 @@ export declare interface RouteQueryAndHash {
  * Router instance.
  */
 export declare interface Router {
+    matcher: RouterMatcher;
     /**
      * @internal
      */
@@ -1512,6 +1513,7 @@ export declare interface RouterMatcher {
  * Options to initialize a {@link Router} instance.
  */
 export declare interface RouterOptions extends PathParserOptions {
+    matcher?: RouterMatcher;
     /**
      * History implementation used by the router. Most web applications should use
      * `createWebHistory` but it requires the server to be properly configured.
