@@ -7,6 +7,7 @@ import type {
 import type { TypesConfig } from '../config'
 import type { NavigationFailure } from '../errors'
 import { ComponentPublicInstance } from 'vue'
+import { NavigationInformation } from 'src/history/common.js'
 
 /**
  * Return types for a Navigation Guard. Based on `TypesConfig`
@@ -64,7 +65,8 @@ export interface NavigationHookAfter {
   (
     to: RouteLocationNormalized,
     from: RouteLocationNormalizedLoaded,
-    failure?: NavigationFailure | void
+    failure?: NavigationFailure | void,
+    info?: Partial<NavigationInformation>
   ): unknown
 }
 

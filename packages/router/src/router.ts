@@ -20,7 +20,12 @@ import type {
   RouteLocationAsString,
   RouteRecordNameGeneric,
 } from './typed-routes'
-import { RouterHistory, HistoryState, NavigationType } from './history/common'
+import {
+  RouterHistory,
+  HistoryState,
+  NavigationType,
+  NavigationInformation,
+} from './history/common'
 import {
   ScrollPosition,
   getSavedScrollPosition,
@@ -808,10 +813,15 @@ export function createRouter(options: RouterOptions): Router {
             data
           )
         }
+        const info: Partial<NavigationInformation> = {
+          type: NavigationType.push,
+          replace,
+        }
         triggerAfterEach(
           toLocation as RouteLocationNormalizedLoaded,
           from,
-          failure
+          failure,
+          info
         )
         return failure
       })
@@ -964,13 +974,14 @@ export function createRouter(options: RouterOptions): Router {
   function triggerAfterEach(
     to: RouteLocationNormalizedLoaded,
     from: RouteLocationNormalizedLoaded,
-    failure?: NavigationFailure | void
+    failure?: NavigationFailure | void,
+    info?: Partial<NavigationInformation>
   ): void {
     // navigation is confirmed, call afterGuards
     // TODO: wrap with error handlers
     afterGuards
       .list()
-      .forEach(guard => runWithContext(() => guard(to, from, failure)))
+      .forEach(guard => runWithContext(() => guard(to, from, failure, info)))
   }
 
   /**
@@ -1141,7 +1152,8 @@ export function createRouter(options: RouterOptions): Router {
           triggerAfterEach(
             toLocation as RouteLocationNormalizedLoaded,
             from,
-            failure
+            failure,
+            info
           )
         })
         // avoid warnings in the console about uncaught rejections, they are logged by triggerErrors
