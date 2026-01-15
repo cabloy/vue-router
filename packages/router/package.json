@@ -1,14 +1,14 @@
 {
   "name": "@cabloy/vue-router",
-  "version": "4.4.14",
+  "version": "4.4.15",
   "main": "index.js",
   "unpkg": "dist/vue-router.global.js",
   "jsdelivr": "dist/vue-router.global.js",
   "module": "dist/vue-router.mjs",
-  "types": "dist/vue-router.d.mts",
+  "types": "dist/vue-router.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/vue-router.d.mts",
+      "types": "./dist/vue-router.d.ts",
       "node": {
         "import": {
           "production": "./dist/vue-router.node.mjs",
