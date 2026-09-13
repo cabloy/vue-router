@@ -393,6 +393,10 @@ export interface Router {
  *
  * @param options - {@link RouterOptions}
  */
+type RouterWithPrepareNavigation = Router & {
+  __prepareNavigation?: (to: unknown) => Promise<void> | void
+}
+
 export function createRouter(options: RouterOptions): Router {
   const matcher =
     options.matcher ?? createRouterMatcher(options.routes, options)
@@ -692,10 +696,17 @@ export function createRouter(options: RouterOptions): Router {
     to: RouteLocationRaw | RouteLocation,
     redirectedFrom?: RouteLocation
   ): Promise<NavigationFailure | void | undefined> {
-    // patch
+    // patch: a router may provide its own route preparation hook. This keeps
+    // secondary routers independent from the first installed Vue app.
     const _path = to && typeof to === 'object' ? (<any>to).name ?? to.path : to
-    const app = installedApps.values().next().value as any
-    await app.zova.meta.$router.ensureRoute(_path)
+    if (router.__prepareNavigation) {
+      await router.__prepareNavigation(_path)
+    } else {
+      const app = installedApps.values().next().value as any
+      if (app?.zova?.meta?.$router) {
+        await app.zova.meta.$router.ensureRoute(_path)
+      }
+    }
 
     const targetLocation: RouteLocation = (pendingLocation = resolve(to))
     const from = currentRoute.value
@@ -1251,7 +1262,7 @@ export function createRouter(options: RouterOptions): Router {
   let started: boolean | undefined
   const installedApps = new Set<App>()
 
-  const router: Router = {
+  const router: RouterWithPrepareNavigation = {
     matcher,
 
     currentRoute,
@@ -1264,6 +1275,9 @@ export function createRouter(options: RouterOptions): Router {
     getRoutes,
     resolve,
     options,
+
+    // Internal adapter hook used by Zova secondary routers.
+    __prepareNavigation: undefined,
 
     push,
     replace,

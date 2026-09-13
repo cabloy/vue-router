@@ -16,6 +16,10 @@ import { mockWarn } from './vitest-mock-warn'
 
 declare var __DEV__: boolean
 
+type RouterWithPrepareNavigation = ReturnType<typeof createRouter> & {
+  __prepareNavigation?: (to: unknown) => Promise<void> | void
+}
+
 const routes: RouteRecordRaw[] = [
   { path: '/', component: components.Home, name: 'home' },
   { path: '/home', redirect: '/' },
@@ -106,6 +110,68 @@ describe('Router', () => {
     const history = createMemoryHistory()
     const router = createRouter({ history, routes })
     expect(router.currentRoute.value).toEqual(START_LOCATION_NORMALIZED)
+  })
+
+  it('navigates without an installed app or preparation hook', async () => {
+    const history = createMemoryHistory()
+    const router = createRouter({ history, routes })
+
+    await router.push('/foo')
+
+    expect(router.currentRoute.value.name).toBe('Foo')
+  })
+
+  it('prepares routes independently before resolving navigation', async () => {
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [],
+    }) as RouterWithPrepareNavigation
+    const prepareNavigation = vi.fn(async (to: unknown) => {
+      expect(to).toBe('dynamic')
+      router.addRoute({
+        name: 'dynamic',
+        path: '/dynamic',
+        component: components.Foo,
+      })
+    })
+    router.__prepareNavigation = prepareNavigation
+
+    await router.push({ name: 'dynamic' })
+
+    expect(prepareNavigation).toHaveBeenCalledTimes(1)
+    expect(router.currentRoute.value).toMatchObject({
+      name: 'dynamic',
+      path: '/dynamic',
+    })
+  })
+
+  it('keeps preparation hooks isolated between router instances', async () => {
+    const routerA = createRouter({
+      history: createMemoryHistory(),
+      routes: [],
+    }) as RouterWithPrepareNavigation
+    const routerB = createRouter({
+      history: createMemoryHistory(),
+      routes: [],
+    }) as RouterWithPrepareNavigation
+    const prepareA = vi.fn((to: unknown) => {
+      expect(to).toBe('a')
+      routerA.addRoute({ name: 'a', path: '/a', component: components.Foo })
+    })
+    const prepareB = vi.fn((to: unknown) => {
+      expect(to).toBe('b')
+      routerB.addRoute({ name: 'b', path: '/b', component: components.Bar })
+    })
+    routerA.__prepareNavigation = prepareA
+    routerB.__prepareNavigation = prepareB
+
+    await routerA.push({ name: 'a' })
+    await routerB.push({ name: 'b' })
+
+    expect(prepareA).toHaveBeenCalledTimes(1)
+    expect(prepareB).toHaveBeenCalledTimes(1)
+    expect(routerA.currentRoute.value.path).toBe('/a')
+    expect(routerB.currentRoute.value.path).toBe('/b')
   })
 
   it('calls history.push with router.push', async () => {
